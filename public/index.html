@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f7f8">
+    <meta name="description" content="Reserve or cancel an office parking space.">
+    <title>Office Parking Reservations</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="Office parking reservations home">
+          <span class="brand-mark" aria-hidden="true">P</span>
+          <span>Office parking</span>
+        </a>
+        <div class="user-pill" id="user-pill" hidden></div>
+      </header>
+
+      <main>
+        <section class="intro">
+          <div>
+            <p class="eyebrow">MADISON OFFICE</p>
+            <h1>Reserve a parking space</h1>
+            <p class="intro-copy">Choose a space for a day or set up a weekly schedule. Reservations are shared with the office.</p>
+          </div>
+          <div class="availability-note"><span class="status-dot" aria-hidden="true"></span> Spaces 18, 19, and 20 · Full day</div>
+        </section>
+
+        <div class="notice" id="notice" role="status" aria-live="polite" hidden></div>
+
+        <section class="booking-card" aria-labelledby="booking-heading">
+          <div class="card-heading">
+            <div>
+              <p class="eyebrow">NEW RESERVATION</p>
+              <h2 id="booking-heading">Book a space</h2>
+            </div>
+            <span class="step-label">Your office email is used to manage your booking</span>
+          </div>
+          <form id="booking-form">
+            <div class="booking-mode" role="group" aria-label="Reservation frequency">
+              <button class="mode-button is-selected" type="button" data-mode="single" aria-pressed="true">One day</button>
+              <button class="mode-button" type="button" data-mode="weekly" aria-pressed="false">Repeat weekly</button>
+            </div>
+
+            <div class="form-grid">
+              <label class="field">
+                <span>Your name</span>
+                <input id="owner-name" name="ownerName" autocomplete="name" maxlength="80" required placeholder="Name shown on the schedule">
+              </label>
+              <label class="field">
+                <span>Space</span>
+                <select id="spot" name="spot" required>
+                  <option value="18">Space 18</option>
+                  <option value="19">Space 19</option>
+                  <option value="20">Space 20</option>
+                </select>
+              </label>
+              <label class="field">
+                <span id="start-label">Date</span>
+                <input id="start-date" name="startDate" type="date" required>
+              </label>
+              <label class="field" id="end-field" hidden>
+                <span>Repeat through</span>
+                <input id="end-date" name="endDate" type="date">
+              </label>
+            </div>
+
+            <fieldset class="weekday-field" id="weekday-field" hidden>
+              <legend>Repeat on</legend>
+              <div class="weekday-options">
+                <label><input type="checkbox" name="weekday" value="1"><span>Mon</span></label>
+                <label><input type="checkbox" name="weekday" value="2"><span>Tue</span></label>
+                <label><input type="checkbox" name="weekday" value="3"><span>Wed</span></label>
+                <label><input type="checkbox" name="weekday" value="4"><span>Thu</span></label>
+                <label><input type="checkbox" name="weekday" value="5"><span>Fri</span></label>
+                <label><input type="checkbox" name="weekday" value="6"><span>Sat</span></label>
+                <label><input type="checkbox" name="weekday" value="0"><span>Sun</span></label>
+              </div>
+              <p class="field-hint">Every matching date from the start date through the end date will be reserved.</p>
+            </fieldset>
+
+            <div class="form-footer">
+              <p class="field-hint">If a requested date is taken, the schedule will identify the conflict before saving.</p>
+              <button class="primary-button" id="submit-button" type="submit">Reserve space</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="schedule-section" aria-labelledby="schedule-heading">
+          <div class="schedule-heading">
+            <div>
+              <p class="eyebrow">SHARED SCHEDULE</p>
+              <h2 id="schedule-heading">Reservations</h2>
+            </div>
+            <div class="month-controls">
+              <button type="button" id="previous-month" class="icon-button" aria-label="Previous month">‹</button>
+              <span id="month-label" aria-live="polite"></span>
+              <button type="button" id="next-month" class="icon-button" aria-label="Next month">›</button>
+            </div>
+          </div>
+          <div class="schedule-wrap">
+            <table class="schedule-table">
+              <thead>
+                <tr><th scope="col">Date</th><th scope="col">Space 18</th><th scope="col">Space 19</th><th scope="col">Space 20</th></tr>
+              </thead>
+              <tbody id="schedule-body"></tbody>
+            </table>
+          </div>
+          <p class="schedule-footnote">Reservations cover the full day. A recurring booking creates a separate reservation for each date, so you can cancel one date or the full series.</p>
+        </section>
+
+        <section class="admin-section" id="admin-section" hidden aria-labelledby="admin-heading">
+          <div class="schedule-heading">
+            <div>
+              <p class="eyebrow">ADMIN</p>
+              <h2 id="admin-heading">Manage reservations</h2>
+            </div>
+            <button type="button" id="admin-toggle" class="secondary-button">Show upcoming bookings</button>
+          </div>
+          <div id="admin-list" class="admin-list" hidden></div>
+        </section>
+      </main>
+
+      <footer><span>Office parking reservations</span><span>No email notifications are sent.</span></footer>
+    </div>
+  </body>
+</html>
