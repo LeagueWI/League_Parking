@@ -1,0 +1,18 @@
+{
+  "name": "lwm-parking-reservations",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:create": "wrangler d1 create parking-reservations",
+    "db:migrate:local": "wrangler d1 migrations apply parking-reservations --local",
+    "db:migrate:remote": "wrangler d1 migrations apply parking-reservations --remote"
+  },
+  "devDependencies": {
+    "wrangler": "^4.35.0"
+  }
+}
+
