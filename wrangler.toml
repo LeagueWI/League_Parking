@@ -1,0 +1,23 @@
+name = "lwm-parking-reservations"
+main = "src/index.js"
+compatibility_date = "2026-10-06"
+keep_vars = true
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = ["/api/*"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "parking-reservations"
+# Replace this value with the database_id returned by `npm run db:create`.
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+[vars]
+STAFF_EMAIL_DOMAIN = "lwm-info.org"
+APP_TIME_ZONE = "America/Chicago"
+
+# Configure these in the Cloudflare Worker dashboard, not in this file.
+# ACCESS_TEAM_DOMAIN, ACCESS_AUD, ADMIN_EMAILS
