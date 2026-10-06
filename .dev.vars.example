@@ -1,0 +1,6 @@
+# Copy this file to .dev.vars only for local testing.
+DEV_AUTH=true
+STAFF_EMAIL_DOMAIN=lwm-info.org
+ADMIN_EMAILS=developer@lwm-info.org
+APP_TIME_ZONE=America/Chicago
+
