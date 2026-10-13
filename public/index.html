@@ -88,7 +88,24 @@
           </form>
         </section>
 
-        <section class="schedule-section" aria-labelledby="schedule-heading">
+        <section class="parking-map-card" aria-labelledby="map-heading">
+          <div class="schedule-heading">
+            <div><p class="eyebrow">PARKING AVAILABILITY</p><h2 id="map-heading">Choose a date and space</h2></div>
+            <label class="map-date-field">Reservation date <input id="map-date" type="date" aria-label="Date to view parking availability"></label>
+          </div>
+          <p class="intro-copy map-description">Select an available space to reserve it. Select a reserved space to cancel that date or its recurring series.</p>
+          <div class="parking-layout" aria-label="Parking spaces 20, 19 and 18, left to right; neighboring company stall is not available">
+            <img src="/parking-layout.jpg" alt="Overhead view of parking stalls. The other company's stall is at far left, then spaces 20, 19 and 18 from left to right.">
+            <button type="button" class="parking-spot parking-20" data-map-spot="20" aria-label="Space 20">20<span class="parking-status">Loading</span></button>
+            <button type="button" class="parking-spot parking-19" data-map-spot="19" aria-label="Space 19">19<span class="parking-status">Loading</span></button>
+            <button type="button" class="parking-spot parking-18" data-map-spot="18" aria-label="Space 18">18<span class="parking-status">Loading</span></button>
+          </div>
+          <p class="map-note">The stall labeled “Other Company Stall” is not available for League reservations.</p>
+        </section>
+
+        <div class="view-switch"><button type="button" id="month-toggle" class="secondary-button" aria-expanded="false" aria-controls="month-section">Show full monthly schedule</button></div>
+
+        <section class="schedule-section" id="month-section" hidden aria-labelledby="schedule-heading">
           <div class="schedule-heading">
             <div>
               <p class="eyebrow">SHARED SCHEDULE</p>
