@@ -16,7 +16,6 @@
           <span class="brand-mark" aria-hidden="true">P</span>
           <span>Office parking</span>
         </a>
-        <div class="user-pill" id="user-pill" hidden></div>
       </header>
 
       <main>
@@ -37,7 +36,7 @@
               <p class="eyebrow">NEW RESERVATION</p>
               <h2 id="booking-heading">Book a space</h2>
             </div>
-            <span class="step-label">Your office email is used to manage your booking</span>
+            <span class="step-label">Enter your name to show who reserved the space</span>
           </div>
           <form id="booking-form">
             <div class="booking-mode" role="group" aria-label="Reservation frequency">
@@ -109,19 +108,9 @@
               <tbody id="schedule-body"></tbody>
             </table>
           </div>
-          <p class="schedule-footnote">Reservations cover the full day. A recurring booking creates a separate reservation for each date, so you can cancel one date or the full series.</p>
+          <p class="schedule-footnote">Reservations cover the full day. Anyone with the link can reserve or cancel a space. A recurring booking creates a separate reservation for each date, so you can cancel one date or the full series.</p>
         </section>
 
-        <section class="admin-section" id="admin-section" hidden aria-labelledby="admin-heading">
-          <div class="schedule-heading">
-            <div>
-              <p class="eyebrow">ADMIN</p>
-              <h2 id="admin-heading">Manage reservations</h2>
-            </div>
-            <button type="button" id="admin-toggle" class="secondary-button">Show upcoming bookings</button>
-          </div>
-          <div id="admin-list" class="admin-list" hidden></div>
-        </section>
       </main>
 
       <footer><span>Office parking reservations</span><span>No email notifications are sent.</span></footer>
