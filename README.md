@@ -5,10 +5,10 @@ A small, staff-only reservation app for parking spaces **18, 19, and 20**. Staff
 ## How it works
 
 - The browser displays a month at a time with all three spaces.
-- Cloudflare Access provides staff sign-in. The Worker verifies the signed Access token and checks the staff email domain before returning reservation data or accepting changes.
+- The application opens without sign-in. Anyone with its URL can view, create, or cancel any reservation. Do not use for confidential information.
 - Cloudflare D1 stores active reservations. A database uniqueness rule permits only one reservation for each space and date, including when two people submit at nearly the same time.
 - Recurring reservations are stored as individual dates plus a series record. If a date conflicts, the series is not partially saved. The response identifies conflicts found before submission; a simultaneous claim is rejected and the schedule can be refreshed.
-- Staff may cancel their own reservation. An administrator may cancel any date or any series.
+- Anyone can cancel any date or recurring series.
 - Cancellation removes the active record and releases the date immediately. The app does not retain booking history or send email.
 
 ## Local checks
@@ -31,46 +31,16 @@ The local identity override works only for `localhost` or `127.0.0.1`. It is not
 
 ## Cloudflare setup
 
-1. Create a D1 database:
+The application uses a Cloudflare Worker and D1. Authentication is not required.
 
-   ```sh
-   npx wrangler login
-   npm run db:create
-   ```
+1. Create the D1 database named `parking-reservations`.
+2. Put its actual database ID in `wrangler.toml`.
+3. Apply migrations to the remote database with `npm run db:migrate:remote` from an authenticated Wrangler environment, or apply the complete SQL migration in the D1 dashboard before use.
+4. In Workers & Pages, connect the `LeagueWI/League_Parking` repository and deploy the Worker. Cloudflare Access protection should be **off** as requested.
+5. Verify that D1 binding `DB` references `parking-reservations`.
+6. Test booking, preventing duplicate bookings, canceling dates, and canceling series before sharing.
 
-2. Replace the placeholder `database_id` in `wrangler.toml` with the ID returned by that command.
-3. Apply the schema to the remote database:
-
-   ```sh
-   npm run db:migrate:remote
-   ```
-
-4. Deploy once to create the Worker in your account:
-
-   ```sh
-   npm run deploy
-   ```
-
-5. In Cloudflare, open **Workers & Pages**, select `lwm-parking-reservations`, and enable **Protect this Worker behind Access** for all traffic. Set an Access policy that allows the `lwm-info.org` email domain. This protects the Worker URL, including its `workers.dev` address, without requiring a separate website host name.
-6. Configure these remaining Worker values in Cloudflare. Keep administrator email addresses out of the repository and store `ADMIN_EMAILS` as a Secret.
-
-   | Variable | Value |
-   | --- | --- |
-   | `ACCESS_TEAM_DOMAIN` | `https://<your-team>.cloudflareaccess.com` |
-   | `ACCESS_AUD` | The audience tag for the parking app's Cloudflare Access application |
-   | `ADMIN_EMAILS` (Secret) | Comma-separated office email addresses allowed to cancel any reservation |
-
-`STAFF_EMAIL_DOMAIN` and `APP_TIME_ZONE` are already set in `wrangler.toml`. The `keep_vars` setting preserves values you configure in the dashboard during later deployments.
-
-7. Redeploy so the API can validate the Access token:
-
-   ```sh
-   npm run deploy
-   ```
-
-8. Open the protected `workers.dev` URL, sign in, and add any standing weekly reservations through **Repeat weekly**.
-
-The API independently verifies the `Cf-Access-Jwt-Assertion` signature, issuer, audience, expiration, and staff email domain. Protect the application hostname with Cloudflare Access as well. The Worker does not trust a client-supplied email address for ownership.
+**Public access warning:** Anyone who knows or discovers the URL can view the schedule, submit bookings, and cancel any booking. A URL is not an access control.
 
 ## Operating rules
 
@@ -78,5 +48,5 @@ The API independently verifies the `Cf-Access-Jwt-Assertion` signature, issuer, 
 - A one-time reservation can be made for today or a future date.
 - A recurring series can include multiple weekdays and must have an end date no more than one year after its start.
 - Each date in a series is an individual active reservation. Staff can cancel one date without canceling the rest.
-- The schedule shows the reserving person's display name. The administrator view also shows their office email address for the next 93 days.
-- No names, reservations, credentials, or API keys belong in GitHub.
+- The schedule shows the name supplied for each reservation. No email address is required or displayed.
+- No reservation records, credentials, or API keys belong in GitHub.
