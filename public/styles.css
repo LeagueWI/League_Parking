@@ -115,3 +115,27 @@ footer { display: flex; justify-content: space-between; gap: 15px; padding: 0 0 
   button, input, select { transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease; }
 }
 
+
+/* Date-driven visual parking map */
+.parking-map-card { padding: 26px; margin-bottom: 18px; background: var(--paper); border: 1px solid #e3eaec; border-radius: 16px; box-shadow: var(--shadow); }
+.map-date-field { display: flex; flex-direction: column; gap: 7px; color: #536870; font-size: 12px; font-weight: 700; }
+.map-date-field input { min-height: 42px; padding: 8px 11px; font: inherit; color: var(--ink); background: white; border: 1px solid #cddadd; border-radius: 8px; }
+.map-description { margin: 10px 0 20px; }
+.parking-layout { position: relative; width: 100%; overflow: hidden; border-radius: 12px; background: #b6b6b6; }
+.parking-layout img { display: block; width: 100%; height: auto; }
+.parking-spot { position: absolute; top: 29%; width: 16.8%; min-height: 24%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 8px; border: 2px solid; border-radius: 10px; font-size: clamp(14px, 2.2vw, 24px); font-weight: 800; background: rgba(255,255,255,.88); box-shadow: 0 4px 14px rgba(0,0,0,.13); overflow-wrap: anywhere; }
+.parking-20 { left: 37.7%; }
+.parking-19 { left: 59%; }
+.parking-18 { left: 78.5%; }
+.parking-spot.is-available { color: #105e47; border-color: #2f956f; background: rgba(225,249,234,.94); }
+.parking-spot.is-reserved { color: #7b2e25; border-color: #ba5442; background: rgba(255,234,228,.95); }
+.parking-spot:focus-visible { outline: 3px solid #113f79; outline-offset: 3px; }
+.parking-status { font-size: clamp(10px, 1.4vw, 17px); line-height: 1.25; font-weight: 700; text-align: center; }
+.map-note { margin: 11px 0 0; font-size: 12px; color: var(--muted); }
+.view-switch { margin: 0 0 20px; text-align: right; }
+@media (max-width: 760px) {
+  .parking-map-card { padding: 16px; }
+  .parking-map-card .schedule-heading { align-items: stretch; }
+  .parking-spot { top: 27%; min-height: 27%; padding: 3px; border-width: 1px; border-radius: 5px; gap: 2px; font-size: 12px; }
+  .parking-status { font-size: 9px; }
+}
