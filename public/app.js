@@ -1,10 +1,8 @@
 const spots = [18, 19, 20];
 const state = {
   currentMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-  user: null,
   reservations: [],
-  mode: "single",
-  adminOpen: false
+  mode: "single"
 };
 
 const el = (id) => document.getElementById(id);
@@ -65,14 +63,6 @@ async function api(path, options = {}) {
   return data;
 }
 
-async function loadSession() {
-  state.user = await api("/api/session");
-  el("user-pill").textContent = "Signed in · " + state.user.email;
-  el("user-pill").hidden = false;
-  if (state.user.name && !el("owner-name").value) el("owner-name").value = state.user.name;
-  el("admin-section").hidden = !state.user.admin;
-}
-
 async function loadReservations() {
   const year = state.currentMonth.getFullYear();
   const month = state.currentMonth.getMonth();
@@ -100,8 +90,8 @@ function renderSchedule(first, last) {
         const buttonLabel = iso < today ? "Past" : "Reserve";
         return "<td><button type=\"button\" class=\"reserve-button\"" + disabled + " data-reserve-date=\"" + iso + "\" data-reserve-spot=\"" + spot + "\">" + buttonLabel + "</button></td>";
       }
-      const canCancel = booking.own || state.user.admin;
-      const ownClass = booking.own ? " is-own" : "";
+      const canCancel = true;
+      const ownClass = "";
       let actions = "";
       if (canCancel) {
         actions += "<button type=\"button\" class=\"cancel-button\" data-cancel-id=\"" + escapeHtml(booking.id) + "\">Cancel date</button>";
@@ -157,7 +147,6 @@ async function submitBooking(event) {
     const result = await api("/api/reservations", { method: "POST", body: JSON.stringify(payload) });
     form.reset();
     setMode("single");
-    if (state.user.name) el("owner-name").value = state.user.name;
     showNotice(result.message + " " + result.saved + (result.saved === 1 ? " date reserved." : " dates reserved."));
     await loadReservations();
   } catch (error) {
@@ -177,7 +166,6 @@ async function cancelOne(id) {
     await api("/api/reservations/" + encodeURIComponent(id), { method: "DELETE", body: "{}" });
     showNotice("Reservation canceled. The space is available again.");
     await loadReservations();
-    if (state.adminOpen) await loadAdminReservations();
   } catch (error) {
     showNotice(error.message, true);
   }
@@ -189,27 +177,9 @@ async function cancelSeries(id) {
     const result = await api("/api/series/" + encodeURIComponent(id), { method: "DELETE", body: "{}" });
     showNotice("Recurring series canceled. " + result.count + " dates were released.");
     await loadReservations();
-    if (state.adminOpen) await loadAdminReservations();
   } catch (error) {
     showNotice(error.message, true);
   }
-}
-
-async function loadAdminReservations() {
-  const today = toIsoDate(new Date());
-  const through = new Date();
-  through.setDate(through.getDate() + 92);
-  const data = await api("/api/reservations?start=" + today + "&end=" + toIsoDate(through) + "&admin=1");
-  const container = el("admin-list");
-  if (!data.reservations.length) {
-    container.innerHTML = "<p class=\"admin-empty\">No upcoming reservations.</p>";
-    return;
-  }
-  container.innerHTML = data.reservations.map((booking) => {
-    const date = new Intl.DateTimeFormat(undefined, { weekday: "short", month: "short", day: "numeric", year: "numeric" }).format(parseDate(booking.date));
-    const seriesButton = booking.seriesId ? " <button type=\"button\" class=\"cancel-button\" data-cancel-series=\"" + escapeHtml(booking.seriesId) + "\">Cancel series</button>" : "";
-    return "<div class=\"admin-row\"><strong>" + date + "</strong><span>Space " + booking.spot + "</span><span>" + escapeHtml(booking.ownerName) + "</span><span>" + escapeHtml(booking.ownerEmail || "") + "</span><span class=\"admin-action\"><button type=\"button\" class=\"cancel-button\" data-cancel-id=\"" + escapeHtml(booking.id) + "\">Cancel date</button>" + seriesButton + "</span></div>";
-  }).join("");
 }
 
 async function handleDocumentClick(event) {
@@ -233,10 +203,9 @@ async function start() {
     el("start-date").min = today;
     el("end-date").min = today;
     el("start-date").value = today;
-    await loadSession();
     await loadReservations();
   } catch (error) {
-    showNotice(error.message + " If you are not signed in, open this app from the office access link.", true);
+    showNotice(error.message, true);
     form.querySelectorAll("button, input, select").forEach((control) => { control.disabled = true; });
   }
 }
@@ -244,7 +213,6 @@ async function start() {
 document.querySelectorAll(".mode-button").forEach((button) => button.addEventListener("click", () => setMode(button.dataset.mode)));
 form.addEventListener("submit", submitBooking);
 scheduleBody.addEventListener("click", handleDocumentClick);
-el("admin-list").addEventListener("click", handleDocumentClick);
 el("previous-month").addEventListener("click", async () => {
   state.currentMonth = new Date(state.currentMonth.getFullYear(), state.currentMonth.getMonth() - 1, 1);
   await loadReservations();
@@ -252,12 +220,6 @@ el("previous-month").addEventListener("click", async () => {
 el("next-month").addEventListener("click", async () => {
   state.currentMonth = new Date(state.currentMonth.getFullYear(), state.currentMonth.getMonth() + 1, 1);
   await loadReservations();
-});
-el("admin-toggle").addEventListener("click", async () => {
-  state.adminOpen = !state.adminOpen;
-  el("admin-list").hidden = !state.adminOpen;
-  el("admin-toggle").textContent = state.adminOpen ? "Hide upcoming bookings" : "Show upcoming bookings";
-  if (state.adminOpen) await loadAdminReservations();
 });
 notice.addEventListener("click", clearNotice);
 
