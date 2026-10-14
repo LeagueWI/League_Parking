@@ -1,3 +1,4 @@
+import { sendParkingEmail, scheduledParkingEmail } from "./weekly-email.js";
 import { currentDateInTimeZone, dateRange, isValidDate, isValidSpot } from "./booking-rules.js";
 
 const MAX_QUERY_DAYS = 93;
@@ -140,10 +141,19 @@ function matchRoute(pathname, expression) {
 }
 
 export default {
+  scheduled: scheduledParkingEmail,
   async fetch(request, env) {
     const url = new URL(request.url);
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
     try {
+      if (url.pathname === "/api/internal/test-parking-email") {
+        if (request.method !== "POST") return errorJson("Method not allowed.", 405);
+        const expected = String(env.PARKING_EMAIL_TEST_TOKEN || "");
+        const actual = String(request.headers.get("Authorization") || "");
+        if (!expected || actual !== "Bearer " + expected) return errorJson("Unauthorized.", 401);
+        const result = await sendParkingEmail(env, true);
+        return json(result);
+      }
       if (request.method === "GET" && url.pathname === "/api/session") {
         return json({ authenticationRequired: false });
       }
