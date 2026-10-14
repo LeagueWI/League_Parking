@@ -18,6 +18,11 @@ migrations_dir = "migrations"
 [vars]
 STAFF_EMAIL_DOMAIN = "lwm-info.org"
 APP_TIME_ZONE = "America/Chicago"
+PARKING_EMAIL_ENABLED = "false"
 
 # Configure these in the Cloudflare Worker dashboard, not in this file.
 # ACCESS_TEAM_DOMAIN, ACCESS_AUD, ADMIN_EMAILS
+
+# Checks 6 PM Central on Sundays across daylight saving changes.
+[triggers]
+crons = ["0 0,23 * * *"]
