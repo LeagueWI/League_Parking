@@ -38,18 +38,36 @@ async function createReport(env) {
     if (lookup.has(key)) throw new Error("Duplicate parking reservation: " + key);
     lookup.set(key, r.name || "Reserved");
   }
-  const lines = days.map(d => [
-    d.day + " (" + d.date + ")",
-    ...SPOTS.map(spot => "Space " + spot + ": " + (lookup.get(d.date + "/" + spot) || "Available"))
-  ].join("\n")).join("\n\n");
+  const dateLabel = (value) => {
+    const months = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "June", "July", "Aug.", "Sept.", "Oct.", "Nov.", "Dec."];
+    return months[Number(value.slice(5, 7)) - 1] + " " + Number(value.slice(8, 10));
+  };
+  const cellStyle = "padding:12px 10px;border:1px solid #dce5e8;text-align:left;vertical-align:top;";
+  const rows = days.map((d, i) => {
+    const cells = SPOTS.map(spot => {
+      const name = lookup.get(d.date + "/" + spot);
+      return '<td style="' + cellStyle + (name ? 'color:#233845;' : 'color:#386657;') + '">' +
+        htmlEscape(name || "Available") + '</td>';
+    }).join("");
+    return '<tr style="background:' + (i % 2 ? '#f3f7f6' : '#ffffff') + ';">' +
+      '<th scope="row" style="' + cellStyle + 'font-weight:normal;white-space:nowrap;">' +
+      htmlEscape(dateLabel(d.date)) + '</th>' + cells + '</tr>';
+  }).join("");
+  const summary = lookup.size === 0
+    ? "No reservations this week. All 15 spaces are available."
+    : lookup.size + " reserved · " + (15 - lookup.size) + " available";
+  const headers = ["Date", ...SPOTS.map(spot => "Space " + spot)].map(label =>
+    '<th scope="col" style="' + cellStyle + 'background:#173b50;color:#ffffff;font-weight:bold;">' + label + '</th>'
+  ).join("");
   return {
     start, end, total: lookup.size,
+    weekLabel: dateLabel(start) + "–" + dateLabel(end) + ", " + end.slice(0, 4),
     subject: "Week of " + Number(start.slice(5, 7)) + "/" + Number(start.slice(8, 10)) + ": League Parking Details",
-    message: (lookup.size === 0
-      ? "No reservations for this week. All 15 weekday parking slots are available."
-      : lookup.size + " of 15 weekday parking slots reserved.") + "\n\n" +
-      lines + "\n\nReserve or cancel: " + APP +
-      "\n\nAvailability may change. Check the parking app for current information."
+    message: '<div style="white-space:normal;font-family:Arial,Helvetica,sans-serif;color:#233845;">' +
+      '<p style="margin:0 0 16px;font-size:15px;"><strong>' + htmlEscape(summary) + '</strong></p>' +
+      '<table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;font-size:14px;line-height:1.4;">' +
+      '<thead><tr>' + headers + '</tr></thead><tbody>' + rows + '</tbody></table>' +
+      '<p style="margin:14px 0 0;font-size:12px;color:#687783;">Full-day reservations. Availability may change; check the parking app for the latest schedule.</p></div>'
   };
 }
 async function jotformQuestions(env) {
@@ -70,7 +88,7 @@ async function submitDispatcher(env, recipient, report) {
   const q = await jotformQuestions(env);
   const fields = {
     recipientEmail: recipient,
-    reportingWeek: report.start + " to " + report.end,
+    reportingWeek: report.weekLabel,
     emailSubject: report.subject,
     emailMessage: report.message
   };
