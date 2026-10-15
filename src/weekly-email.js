@@ -44,8 +44,10 @@ async function createReport(env) {
   ].join("\n")).join("\n\n");
   return {
     start, end, total: lookup.size,
-    subject: "Office Parking Availability | " + start + " to " + end,
-    message: "League Office Parking — upcoming week\n\n" +
+    subject: "Week of " + Number(start.slice(5, 7)) + "/" + Number(start.slice(8, 10)) + ": League Parking Details",
+    message: (lookup.size === 0
+      ? "No reservations for this week. All 15 weekday parking slots are available."
+      : lookup.size + " of 15 weekday parking slots reserved.") + "\n\n" +
       lines + "\n\nReserve or cancel: " + APP +
       "\n\nAvailability may change. Check the parking app for current information."
   };
